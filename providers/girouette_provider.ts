@@ -29,46 +29,35 @@ export default class GirouetteProvider {
 
   constructor(protected app: ApplicationService) {}
 
-  /**
-   * Register routes from the app directory
-   * after the application has booted
-   */
   async start() {
     this.#router = await this.app.container.make('router')
-
     await this.#register(join(cwd(), 'app'))
   }
 
   async #register(directory: string) {
     const files = await readdir(directory, { withFileTypes: true })
-
     for (const file of files) {
       const fullPath = join(directory, file.name)
-
       if (file.isDirectory()) {
         await this.#register(fullPath)
       } else if (file.isFile() && file.name.endsWith('_controller.ts')) {
         const controller = await import(fullPath)
         const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default)
-
-        for (const r in routes) {
-          this.#registerRoute(controller, r, routes[r])
+        if (routes) {
+          for (const methodName in routes) {
+            const methodRoutes = routes[methodName]
+            for (const route of methodRoutes) {
+              this.#registerRoute(controller, methodName, route)
+            }
+          }
         }
-
         this.#registerResource(controller)
       }
     }
   }
 
-  /**
-   * Register a single route.
-   * @param controller The controller class.
-   * @param controllerMethodName The method name of the controller.
-   * @param route The route object.
-   */
   #registerRoute(controller: any, controllerMethodName: string, route: GirouetteRoute) {
     const { method, pattern, name, where, middleware } = route
-
     const adonisRoute = this.#router!.route(
       pattern,
       [method],
@@ -77,13 +66,11 @@ export default class GirouetteProvider {
     if (name) {
       adonisRoute.as(name)
     }
-
     if (where) {
       for (const w of where) {
         adonisRoute.where(w.key, w.matcher)
       }
     }
-
     if (middleware) {
       for (const m of middleware) {
         adonisRoute.use(m)
@@ -96,19 +83,15 @@ export default class GirouetteProvider {
     if (!resourcePattern) {
       return
     }
-
     const resource = this.#router!.resource(resourcePattern, controller.default)
-
     const resourceName = Reflect.getMetadata(REFLECT_RESOURCE_NAME_KEY, controller.default)
     if (resourceName) {
       resource.as(resourceName)
     }
-
     const resourceMiddleware = Reflect.getMetadata(
       REFLECT_RESOURCE_MIDDLEWARE_KEY,
       controller.default
     )
-
     if (resourceMiddleware) {
       for (const { actions, middleware } of resourceMiddleware) {
         resource.middleware(actions, middleware)

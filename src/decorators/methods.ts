@@ -6,11 +6,19 @@ import { REFLECT_ROUTES_KEY } from '../constants.js'
  * @returns A decorator function
  */
 const MethodDecorator = (method: string) => (pattern: string, name?: string) => {
-  return (target: any, key: string) => {
-    const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, target) || {}
+  return (target: any, key: string, descriptor: PropertyDescriptor) => {
+    const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, target.constructor) || {}
     const newRoute = { method, pattern, name }
-    routes[key] = routes[key] ? { ...newRoute, ...routes[key] } : newRoute
+
+    if (!routes[key]) {
+      routes[key] = []
+    }
+
+    routes[key].push(newRoute)
+
     Reflect.defineMetadata(REFLECT_ROUTES_KEY, routes, target.constructor)
+
+    return descriptor
   }
 }
 
