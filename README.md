@@ -17,7 +17,17 @@ Girouette allows you to define routes using decorators in your AdonisJS v6 contr
 To use Girouette decorators, import them in your controller file:
 
 ```typescript
-import { Get, Post, Put, Patch, Delete, Any, RouteMiddleware, Resource, Where } from '@softwarecitadel/girouette'
+import {
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Any,
+  Middleware,
+  Resource,
+  Where,
+} from '@softwarecitadel/girouette'
 ```
 
 Then, you can use these decorators to define routes:
@@ -54,11 +64,11 @@ export default class UsersController {
 
 ```typescript
 import { middleware } from '#start/kernel'
-import { Get, RouteMiddleware } from '@softwarecitadel/girouette'
+import { Get, Middleware } from '@softwarecitadel/girouette'
 
 export default class UsersController {
   @Get('/admin/users')
-  @RouteMiddleware([middleware.auth()])
+  @Middleware([middleware.auth()])
   async adminIndex({ response }: HttpContext) {
     // This route is protected by the auth middleware
   }
@@ -97,12 +107,12 @@ export default class PostsController {
 You can combine multiple decorators on a single method:
 
 ```typescript
-import { Get, RouteMiddleware, Where } from '@softwarecitadel/girouette'
+import { Get, Middleware, Where } from '@softwarecitadel/girouette'
 import { middleware } from '#start/kernel'
 
 export default class PostsController {
   @Get('/posts/:id')
-  @RouteMiddleware([middleware.auth()])
+  @Middleware([middleware.auth()])
   @Where('id', /^\d+$/)
   async show({ params }: HttpContext) {
     // This route is protected by auth middleware and only matches numeric IDs

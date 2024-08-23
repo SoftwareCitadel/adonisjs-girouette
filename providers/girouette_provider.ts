@@ -44,11 +44,8 @@ export default class GirouetteProvider {
         const controller = await import(fullPath)
         const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default)
         if (routes) {
-          for (const methodName in routes) {
-            const methodRoutes = routes[methodName]
-            for (const route of methodRoutes) {
-              this.#registerRoute(controller, methodName, route)
-            }
+          for (const route in routes) {
+            this.#registerRoute(controller, route, routes[route])
           }
         }
         this.#registerResource(controller)

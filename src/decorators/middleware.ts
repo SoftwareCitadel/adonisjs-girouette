@@ -21,17 +21,17 @@ import { REFLECT_RESOURCE_MIDDLEWARE_KEY, REFLECT_ROUTES_KEY } from '../constant
  * }
  */
 export const RouteMiddleware = (middleware: OneOrMore<MiddlewareFn | ParsedNamedMiddleware>) => {
-  return (target: any, propertyKey: string) => {
-    let routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, target) || {}
-    if (!routes[propertyKey]) {
-      routes[propertyKey] = {}
+  return (target: any, key: string) => {
+    const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, target.constructor) || {}
+    if (!routes[key]) {
+      routes[key] = {}
     }
-    if (!routes[propertyKey].middleware) {
-      routes[propertyKey].middleware = [middleware]
+    if (!routes[key].middleware) {
+      routes[key].middleware = [middleware]
     } else {
-      routes[propertyKey].middleware.push(middleware)
+      routes[key].middleware.push(middleware)
     }
-    Reflect.defineMetadata(REFLECT_ROUTES_KEY, routes, target)
+    Reflect.defineMetadata(REFLECT_ROUTES_KEY, routes, target.constructor)
   }
 }
 

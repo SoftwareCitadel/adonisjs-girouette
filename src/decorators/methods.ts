@@ -10,11 +10,11 @@ const MethodDecorator = (method: string) => (pattern: string, name?: string) => 
     const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, target.constructor) || {}
     const newRoute = { method, pattern, name }
 
-    if (!routes[key]) {
-      routes[key] = []
+    if (routes[key]) {
+      routes[key] = { ...newRoute, ...routes[key] }
+    } else {
+      routes[key] = { method, pattern, name }
     }
-
-    routes[key].push(newRoute)
 
     Reflect.defineMetadata(REFLECT_ROUTES_KEY, routes, target.constructor)
 
