@@ -1,3 +1,9 @@
+<div align="center">
+  <a href="https://discord.gg/UvcuprRbTC">
+    <img src="https://dcbadge.vercel.app/api/server/UvcuprRbTC)](https://discord.gg/UvcuprRbTC">
+  </a>
+</div>
+
 # Girouette
 
 > An AdonisJS package allowing decorator-based routing.
