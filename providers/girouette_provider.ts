@@ -40,7 +40,10 @@ export default class GirouetteProvider {
       const fullPath = join(directory, file.name)
       if (file.isDirectory()) {
         await this.#register(fullPath)
-      } else if (file.isFile() && file.name.endsWith('_controller.ts')) {
+      } else if (
+        file.isFile() &&
+        (file.name.endsWith('_controller.ts') || file.name.endsWith('_controller.js'))
+      ) {
         const controller = await import(fullPath)
         const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default)
         if (routes) {
