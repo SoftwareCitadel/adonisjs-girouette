@@ -3,6 +3,7 @@ import type { ApplicationService, HttpRouterService } from '@adonisjs/core/types
 import { cwd } from 'node:process'
 import { join } from 'node:path'
 import { readdir } from 'node:fs/promises'
+import { pathToFileURL } from 'url';
 import {
   MiddlewareFn,
   OneOrMore,
@@ -27,7 +28,7 @@ type GirouetteRoute = {
 export default class GirouetteProvider {
   #router: HttpRouterService | null = null
 
-  constructor(protected app: ApplicationService) {}
+  constructor(protected app: ApplicationService) { }
 
   async start() {
     this.#router = await this.app.container.make('router')
@@ -35,23 +36,23 @@ export default class GirouetteProvider {
   }
 
   async #register(directory: string) {
-    const files = await readdir(directory, { withFileTypes: true })
+    const files = await readdir(directory, { withFileTypes: true });
     for (const file of files) {
-      const fullPath = join(directory, file.name)
+      const fullPath = join(directory, file.name);
       if (file.isDirectory()) {
-        await this.#register(fullPath)
+        await this.#register(fullPath);
       } else if (
         file.isFile() &&
         (file.name.endsWith('_controller.ts') || file.name.endsWith('_controller.js'))
       ) {
-        const controller = await import(fullPath)
-        const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default)
+        const controller = await import(pathToFileURL(fullPath).href);
+        const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default);
         if (routes) {
           for (const route in routes) {
-            this.#registerRoute(controller, route, routes[route])
+            this.#registerRoute(controller, route, routes[route]);
           }
         }
-        this.#registerResource(controller)
+        this.#registerResource(controller);
       }
     }
   }
