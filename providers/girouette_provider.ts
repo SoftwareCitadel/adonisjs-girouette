@@ -3,7 +3,7 @@ import type { ApplicationService, HttpRouterService } from '@adonisjs/core/types
 import { cwd } from 'node:process'
 import { join } from 'node:path'
 import { readdir } from 'node:fs/promises'
-import { pathToFileURL } from 'url'
+import { pathToFileURL } from 'node:url'
 import {
   MiddlewareFn,
   OneOrMore,
