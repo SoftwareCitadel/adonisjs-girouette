@@ -52,7 +52,7 @@ export default class GirouetteProvider {
             this.#registerRoute(controller, route, routes[route])
           }
         }
-        this.#registerResource(controller);
+        this.#registerResource(controller)
       }
     }
   }
