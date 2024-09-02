@@ -3,6 +3,7 @@ import type { ApplicationService, HttpRouterService } from '@adonisjs/core/types
 import { cwd } from 'node:process'
 import { join } from 'node:path'
 import { readdir } from 'node:fs/promises'
+import { pathToFileURL } from 'url'
 import {
   MiddlewareFn,
   OneOrMore,
@@ -44,7 +45,7 @@ export default class GirouetteProvider {
         file.isFile() &&
         (file.name.endsWith('_controller.ts') || file.name.endsWith('_controller.js'))
       ) {
-        const controller = await import(fullPath)
+        const controller = await import(pathToFileURL(fullPath).href)
         const routes = Reflect.getMetadata(REFLECT_ROUTES_KEY, controller.default)
         if (routes) {
           for (const route in routes) {
